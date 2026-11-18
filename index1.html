@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TechNova | Revenue Visualization Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #0b1220;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: auto;
+            min-height: 70px;
+            padding: 0 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #38bdf8;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+        }
+
+        .mobile-menu {
+            display: none;
+            color: white;
+            font-size: 27px;
+            cursor: pointer;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            background:
+                linear-gradient(135deg, #0b1220 0%, #111d35 55%, #102a43 100%);
+            color: white;
+            padding: 75px 25px 85px;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 15px;
+            border-radius: 50px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            color: #67e8f9;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 5vw, 52px);
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            color: #38bdf8;
+        }
+
+        .hero p {
+            max-width: 750px;
+            margin: auto;
+            color: #cbd5e1;
+            font-size: 17px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        main {
+            max-width: 1200px;
+            margin: auto;
+            padding: 60px 25px;
+        }
+
+        section {
+            scroll-margin-top: 90px;
+        }
+
+        .section-title {
+            margin-bottom: 30px;
+        }
+
+        .section-title h2 {
+            font-size: 30px;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .section-title p {
+            color: #64748b;
+        }
+
+        /* =========================
+           SCENARIO CARD
+        ========================= */
+
+        .scenario-card {
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+            margin-bottom: 45px;
+        }
+
+        .scenario-card p {
+            color: #475569;
+        }
+
+        /* =========================
+           DATA CARDS
+        ========================= */
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .data-card {
+            background: #0f172a;
+            color: white;
+            border-radius: 16px;
+            padding: 22px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+        }
+
+        .data-card h3 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .data-card code {
+            color: #e2e8f0;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        /* =========================
+           CHART SECTION
+        ========================= */
+
+        .charts-section {
+            margin-top: 55px;
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 30px;
+
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+
+            transition: transform 0.25s ease,
+                        box-shadow 0.25s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(15, 23, 42, 0.09);
+        }
+
+        .chart-header {
+            margin-bottom: 25px;
+        }
+
+        .chart-header h2 {
+            color: #0f172a;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .chart-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+
+        /* =========================
+           LEARNING SECTION
+        ========================= */
+
+        .learning-section {
+            margin-top: 60px;
+        }
+
+        .learning-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .learning-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 7px 25px rgba(15, 23, 42, 0.05);
+            transition: 0.25s ease;
+        }
+
+        .learning-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+        }
+
+        .learning-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e0f2fe;
+            color: #0284c7;
+            font-weight: 700;
+
+            margin-bottom: 15px;
+        }
+
+        .learning-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .learning-card p {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #0b1220;
+            color: #94a3b8;
+            text-align: center;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        footer strong {
+            color: #38bdf8;
+        }
+
+        /* =========================
+           RESPONSIVE TABLET
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .learning-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero {
+                padding: 60px 20px 70px;
+            }
+
+            main {
+                padding: 50px 20px;
+            }
+
+            .chart-wrapper {
+                height: 350px;
+            }
+        }
+
+        /* =========================
+           RESPONSIVE MOBILE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 0 18px;
+                min-height: 62px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .logo-icon {
+                width: 34px;
+                height: 34px;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 62px;
+                left: 0;
+                width: 100%;
+
+                display: none;
+                flex-direction: column;
+                align-items: stretch;
+
+                background: #0b1220;
+                padding: 12px 18px 18px;
+
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 12px;
+            }
+
+            .hero {
+                padding: 50px 18px 60px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            main {
+                padding: 40px 16px;
+            }
+
+            .section-title h2 {
+                font-size: 25px;
+            }
+
+            .scenario-card {
+                padding: 22px;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .learning-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card {
+                padding: 18px;
+                border-radius: 14px;
+            }
+
+            .chart-header h2 {
+                font-size: 20px;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+        }
+
+        /* =========================
+           SMALL MOBILE
+        ========================= */
+
+        @media (max-width: 400px) {
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .chart-wrapper {
+                height: 260px;
+            }
+
+            .chart-card {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         HEADER / NAVIGATION
+    ========================= -->
+
+    <header>
+
+        <nav class="navbar">
+
+            <a href="#home" class="logo">
+                <div class="logo-icon">TN</div>
+                Tech<span>Nova</span>
+            </a>
+
+            <div class="mobile-menu" onclick="toggleMenu()">
+                ☰
+            </div>
+
+            <ul class="nav-links" id="navLinks">
+                <li>
+                    <a href="#home" onclick="closeMenu()">Home</a>
+                </li>
+
+                <li>
+                    <a href="#scenario" onclick="closeMenu()">Scenario</a>
+                </li>
+
+                <li>
+                    <a href="#data" onclick="closeMenu()">Data</a>
+                </li>
+
+                <li>
+                    <a href="#charts" onclick="closeMenu()">Charts</a>
+                </li>
+
+                <li>
+                    <a href="#learning" onclick="closeMenu()">Learning</a>
+                </li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+         HERO
+    ========================= -->
+
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                DATA ANALYTICS DASHBOARD
+            </div>
+
+            <h1>
+                Revenue Visualization
+                <span>Dashboard</span>
+            </h1>
+
+            <p>
+                A visual analysis of TechNova's monthly revenue,
+                expenses and profit using Chart.js.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+    <main>
+
+        <!-- SCENARIO -->
+
+        <section id="scenario">
+
+            <div class="section-title">
+
+                <h2>Scenario</h2>
+
+                <p>
+                    Understanding the business problem behind the visualization.
+                </p>
+
+            </div>
+
+            <div class="scenario-card">
+
+                <p>
+                    You are a data analyst at a company called TechNova.
+                    Your manager has given you monthly performance data and
+                    asked you to visualize it using Chart.js.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- GIVEN DATA -->
+
+        <section id="data">
+
+            <div class="section-title">
+
+                <h2>Given Data</h2>
+
+                <p>
+                    Monthly performance data used for the visualizations.
+                </p>
+
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-card">
+                    <h3>Months</h3>
+
+                    <code>
+                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+                    </code>
+                </div>
+
+
+                <div class="data-card">
+                    <h3>Revenue</h3>
+
+                    <code>
+                        [50000, 60000, 55000, 70000, 75000, 80000]
+                    </code>
+                </div>
+
+
+                <div class="data-card">
+                    <h3>Expenses</h3>
+
+                    <code>
+                        [30000, 35000, 32000, 40000, 42000, 45000]
+                    </code>
+                </div>
+
+
+                <div class="data-card">
+                    <h3>Profit</h3>
+
+                    <code>
+                        [20000, 25000, 23000, 30000, 33000, 35000]
+                    </code>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHARTS -->
+
+        <section id="charts" class="charts-section">
+
+            <div class="section-title">
+
+                <h2>Revenue Analytics</h2>
+
+                <p>
+                    Visual representation of TechNova's monthly financial performance.
+                </p>
+
+            </div>
+
+
+            <!-- LINE CHART -->
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h2>Line Chart</h2>
+
+                    <p>
+                        Revenue, Expenses and Profit across the six months.
+                    </p>
+
+                </div>
+
+                <div class="chart-wrapper">
+
+                    <canvas id="line"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- BAR CHART -->
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h2>Bar Chart</h2>
+
+                    <p>
+                        Monthly revenue comparison.
+                    </p>
+
+                </div>
+
+                <div class="chart-wrapper">
+
+                    <canvas id="bar"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- PIE CHART -->
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h2>Pie Chart</h2>
+
+                    <p>
+                        Profit distribution for June.
+                    </p>
+
+                </div>
+
+                <div class="chart-wrapper">
+
+                    <canvas id="pie"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- LEARNING -->
+
+        <section id="learning" class="learning-section">
+
+            <div class="section-title">
+
+                <h2>Expected Learning</h2>
+
+                <p>
+                    Key concepts covered in this mini project.
+                </p>
+
+            </div>
+
+
+            <div class="learning-grid">
+
+                <div class="learning-card">
+
+                    <div class="learning-number">
+                        01
+                    </div>
+
+                    <h3>Multiple Datasets</h3>
+
+                    <p>
+                        Handling and visualizing multiple datasets
+                        in a single chart.
+                    </p>
+
+                </div>
+
+
+                <div class="learning-card">
+
+                    <div class="learning-number">
+                        02
+                    </div>
+
+                    <h3>Chart Selection</h3>
+
+                    <p>
+                        Choosing the right chart type for different
+                        types of data.
+                    </p>
+
+                </div>
+
+
+                <div class="learning-card">
+
+                    <div class="learning-number">
+                        03
+                    </div>
+
+                    <h3>Chart Customization</h3>
+
+                    <p>
+                        Customizing charts to make financial data
+                        easier to understand.
+                    </p>
+
+                </div>
+
+
+                <div class="learning-card">
+
+                    <div class="learning-number">
+                        04
+                    </div>
+
+                    <h3>Data Analysis</h3>
+
+                    <p>
+                        Thinking like a data analyst while interpreting
+                        business performance.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <p>
+            <strong>TechNova</strong> · Revenue Visualization Dashboard
+        </p>
+
+        <p>
+            Built using Chart.js
+        </p>
+
+    </footer>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        /* =========================
+           MOBILE MENU
+        ========================= */
+
+        function toggleMenu() {
+
+            const nav = document.getElementById("navLinks");
+
+            nav.classList.toggle("active");
+
+        }
+
+
+        function closeMenu() {
+
+            const nav = document.getElementById("navLinks");
+
+            nav.classList.remove("active");
+
+        }
+
+
+        /* =========================
+           ORIGINAL DATA
+        ========================= */
+
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+        const revenue = [50000, 60000, 55000, 70000, 75000, 80000];
+
+        const expenses = [30000, 35000, 32000, 40000, 42000, 45000];
+
+        const profit = [20000, 25000, 23000, 30000, 33000, 35000];
+
+
+        /* =========================
+           LINE CHART
+        ========================= */
+
+        const ctx1 = document.getElementById('line');
+
+        new Chart(ctx1, {
+
+            type: 'line',
+
+            data: {
+
+                labels: months,
+
+                datasets: [
+
+                    {
+                        label: 'Revenue',
+                        data: revenue,
+                        borderColor: 'blue',
+                        fill: true
+                    },
+
+                    {
+                        label: 'Expenses',
+                        data: expenses,
+                        borderColor: 'red',
+                        fill: true
+                    },
+
+                    {
+                        label: 'Profit',
+                        data: profit,
+                        borderColor: 'green',
+                        fill: true
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false
+
+            }
+
+        });
+
+
+        /* =========================
+           BAR CHART
+        ========================= */
+
+        const ctx = document.getElementById("bar");
+
+        new Chart(ctx, {
+
+            type: "bar",
+
+            data: {
+
+                labels: months,
+
+                datasets: [
+
+                    {
+
+                        label: 'Revenue',
+
+                        data: revenue,
+
+                        backgroundColor: [
+                            'red',
+                            'blue',
+                            'green',
+                            'orange',
+                            'cyan',
+                            'brown'
+                        ]
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false
+
+            }
+
+        });
+
+
+        /* =========================
+           PIE CHART
+        ========================= */
+
+        const ctx2 = document.getElementById('pie');
+
+        new Chart(ctx2, {
+
+            type: 'pie',
+
+            data: {
+
+                labels: [
+                    "Reinvestment 40 %",
+                    "Salaries: 35 %",
+                    "Misc: 25 %"
+                ],
+
+                datasets: [
+
+                    {
+
+                        data: [40, 35, 25],
+
+                        backgroundColor: [
+                            'red',
+                            'blue',
+                            'yellow'
+                        ]
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    title: {
+
+                        display: true,
+
+                        text: 'fig:  Profit distribution for June'
+
+                    },
+
+                    legend: {
+
+                        position: 'bottom'
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
